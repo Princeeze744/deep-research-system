@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Research System | AI-Powered Research</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           THE SOVEREIGN DESIGN SYSTEM IMPLEMENTATION
+           By Prince Ochidi
+           ============================================ */
+
+        /* CSS Custom Properties (Design Tokens) */
+        :root {
+            /* Color System - Dark Theme */
+            --color-bg-primary: #0a0a0f;
+            --color-bg-secondary: #12121a;
+            --color-bg-tertiary: #1a1a25;
+            --color-bg-elevated: #22222f;
+            --color-bg-hover: #2a2a3a;
+            
+            /* Brand Colors */
+            --color-brand-primary: #6366f1;
+            --color-brand-secondary: #8b5cf6;
+            --color-brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%);
+            --color-brand-glow: rgba(99, 102, 241, 0.4);
+            
+            /* Text Colors */
+            --color-text-primary: #f5f5f7;
+            --color-text-secondary: #a1a1aa;
+            --color-text-tertiary: #71717a;
+            --color-text-muted: #52525b;
+            
+            /* Semantic Colors */
+            --color-success: #10b981;
+            --color-success-bg: rgba(16, 185, 129, 0.1);
+            --color-warning: #f59e0b;
+            --color-warning-bg: rgba(245, 158, 11, 0.1);
+            --color-error: #ef4444;
+            --color-error-bg: rgba(239, 68, 68, 0.1);
+            --color-info: #3b82f6;
+            --color-info-bg: rgba(59, 130, 246, 0.1);
+            
+            /* Border & Dividers */
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-border-hover: rgba(255, 255, 255, 0.15);
+            --color-divider: rgba(255, 255, 255, 0.05);
+            
+            /* Typography Scale (Perfect Fourth - 1.333) */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.333rem;
+            --font-size-2xl: 1.777rem;
+            --font-size-3xl: 2.369rem;
+            --font-size-4xl: 3.157rem;
+            
+            /* Font Weights */
+            --font-weight-light: 300;
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* Spacing Scale (8-point grid) */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            --space-24: 6rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --radius-2xl: 1.5rem;
+            --radius-full: 9999px;
+            
+            /* Shadows (Elevation System) */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+            --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 40px var(--color-brand-glow);
+            
+            /* Animation Timing */
+            --duration-instant: 100ms;
+            --duration-swift: 200ms;
+            --duration-smooth: 350ms;
+            --duration-deliberate: 500ms;
+            
+            /* Easing Curves */
+            --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+            --ease-in: cubic-bezier(0.4, 0.0, 1, 1);
+            --ease-in-out: cubic-bezier(0.4, 0.0, 0.2, 1);
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-regular);
+            line-height: 1.6;
+            color: var(--color-text-primary);
+            background: var(--color-bg-primary);
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Background Gradient Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: var(--font-weight-semibold);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        h1 { font-size: var(--font-size-4xl); }
+        h2 { font-size: var(--font-size-3xl); }
+        h3 { font-size: var(--font-size-2xl); }
+        h4 { font-size: var(--font-size-xl); }
+
+        p {
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+        }
+
+        a {
+            color: var(--color-brand-primary);
+            text-decoration: none;
+            transition: color var(--duration-swift) var(--ease-out);
+        }
+
+        a:hover {
+            color: var(--color-brand-secondary);
+        }
+
+        /* Layout Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--color-border);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--color-brand-gradient);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            box-shadow: var(--shadow-glow);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        /* Main Content */
+        .main {
+            padding-top: calc(72px + var(--space-12));
+            padding-bottom: var(--space-16);
+            min-height: 100vh;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            margin-bottom: var(--space-16);
+            animation: fadeInUp var(--duration-deliberate) var(--ease-out);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-6);
+        }
+
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--color-success);
+            border-radius: var(--radius-full);
+            animation: pulse 2s infinite;
+        }
+
+        .hero h1 {
+            margin-bottom: var(--space-4);
+            background: linear-gradient(135deg, var(--color-text-primary) 0%, var(--color-text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: var(--font-size-lg);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Search Section */
+        .search-section {
+            max-width: 800px;
+            margin: 0 auto var(--space-16);
+            animation: fadeInUp var(--duration-deliberate) var(--ease-out) 100ms both;
+        }
+
+        .search-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-lg);
+            transition: border-color var(--duration-swift) var(--ease-out),
+                        box-shadow var(--duration-swift) var(--ease-out);
+        }
+
+        .search-card:focus-within {
+            border-color: var(--color-brand-primary);
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+        }
+
+        .search-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-3);
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            margin-bottom: var(--space-6);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-bg-tertiary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            color: var(--color-text-primary);
+            transition: all var(--duration-swift) var(--ease-out);
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .search-input::placeholder {
+            color: var(--color-text-tertiary);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--color-brand-primary);
+            background: var(--color-bg-elevated);
+        }
+
+        .search-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-4);
+        }
+
+        .search-hint {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            font-family: var(--font-family);
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            border-radius: var(--radius-lg);
+            border: none;
+            cursor: pointer;
+            transition: all var(--duration-swift) var(--ease-out);
+            text-decoration: none;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: var(--color-brand-gradient);
+            color: white;
+            box-shadow: var(--shadow-md), 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg), 0 0 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--color-bg-hover);
+            border-color: var(--color-border-hover);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--color-text-secondary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-4);
+            font-size: var(--font-size-sm);
+        }
+
+        .btn-lg {
+            padding: var(--space-4) var(--space-8);
+            font-size: var(--font-size-lg);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-6);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .section-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Research History */
+        .history-section {
+            margin-bottom: var(--space-12);
+            animation: fadeInUp var(--duration-deliberate) var(--ease-out) 200ms both;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-4);
+        }
+
+        .history-card {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-5);
+            transition: all var(--duration-swift) var(--ease-out);
+            cursor: pointer;
+        }
+
+        .history-card:hover {
+            border-color: var(--color-border-hover);
+            background: var(--color-bg-tertiary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .history-card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space-4);
+            margin-bottom: var(--space-3);
+        }
+
+        .history-card-title {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-primary);
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .history-card-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            flex-shrink: 0;
+        }
+
+        .status-completed {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+
+        .status-running {
+            background: var(--color-warning-bg);
+            color: var(--color-warning);
+        }
+
+        .status-pending {
+            background: var(--color-info-bg);
+            color: var(--color-info);
+        }
+
+        .status-failed {
+            background: var(--color-error-bg);
+            color: var(--color-error);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: var(--radius-full);
+            background: currentColor;
+        }
+
+        .status-running .status-dot {
+            animation: pulse 1.5s infinite;
+        }
+
+        .history-card-meta {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        .history-card-meta span {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .history-card-actions {
+            display: flex;
+            gap: var(--space-2);
+            margin-top: var(--space-4);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--color-divider);
+        }
+
+        /* Upload Section */
+        .upload-section {
+            animation: fadeInUp var(--duration-deliberate) var(--ease-out) 300ms both;
+        }
+
+        .upload-zone {
+            background: var(--color-bg-secondary);
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-xl);
+            padding: var(--space-10);
+            text-align: center;
+            transition: all var(--duration-swift) var(--ease-out);
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--color-brand-primary);
+            background: var(--color-bg-tertiary);
+        }
+
+        .upload-zone.drag-over {
+            border-color: var(--color-brand-primary);
+            background: rgba(99, 102, 241, 0.1);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .upload-text {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--space-2);
+        }
+
+        .upload-hint {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            opacity: 0;
+            visibility: hidden;
+            transition: all var(--duration-smooth) var(--ease-out);
+            padding: var(--space-6);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--color-bg-secondary);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-2xl);
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow: hidden;
+            transform: scale(0.95) translateY(20px);
+            transition: transform var(--duration-smooth) var(--ease-out);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .modal-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-md);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--duration-swift) var(--ease-out);
+            font-size: 1.25rem;
+        }
+
+        .modal-close:hover {
+            background: var(--color-bg-tertiary);
+            color: var(--color-text-primary);
+        }
+
+        .modal-body {
+            padding: var(--space-6);
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: var(--space-3);
+            padding: var(--space-6);
+            border-top: 1px solid var(--color-border);
+        }
+
+        /* Research Detail */
+        .research-detail-header {
+            margin-bottom: var(--space-6);
+        }
+
+        .research-detail-query {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-4);
+        }
+
+        .research-detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-4);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-tertiary);
+        }
+
+        .research-detail-section {
+            margin-bottom: var(--space-6);
+        }
+
+        .research-detail-section-title {
+            font-size: var(--font-size-base);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-3);
+            color: var(--color-text-primary);
+        }
+
+        .research-report {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            font-size: var(--font-size-sm);
+            line-height: 1.8;
+            color: var(--color-text-secondary);
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .research-findings {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .research-finding {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        .research-finding-icon {
+            color: var(--color-brand-primary);
+            flex-shrink: 0;
+        }
+
+        .cost-card {
+            display: flex;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-lg);
+        }
+
+        .cost-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        .cost-value {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+        }
+
+        .cost-label {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-tertiary);
+            margin-top: var(--space-1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-12) var(--space-6);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            margin-bottom: var(--space-4);
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--space-2);
+        }
+
+        .empty-state-text {
+            color: var(--color-text-tertiary);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-border);
+            border-top-color: var(--color-brand-primary);
+            border-radius: var(--radius-full);
+            animation: spin 0.8s linear infinite;
+        }
+
+        .spinner-lg {
+            width: 40px;
+            height: 40px;
+            border-width: 3px;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            bottom: var(--space-6);
+            right: var(--space-6);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+            z-index: 300;
+        }
+
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4) var(--space-5);
+            background: var(--color-bg-elevated);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight var(--duration-smooth) var(--ease-out);
+            max-width: 400px;
+        }
+
+        .toast-success {
+            border-color: var(--color-success);
+        }
+
+        .toast-error {
+            border-color: var(--color-error);
+        }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        .toast-message {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-primary);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            :root {
+                --font-size-4xl: 2.5rem;
+                --font-size-3xl: 2rem;
+            }
+
+            .container {
+                padding: 0 var(--space-4);
+            }
+
+            .header-content {
+                padding: 0 var(--space-4);
+            }
+
+            .search-card {
+                padding: var(--space-5);
+            }
+
+            .search-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-hint {
+                text-align: center;
+            }
+
+            .history-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .history-card-meta {
+                flex-wrap: wrap;
+            }
+
+            .modal {
+                margin: var(--space-4);
+                max-height: calc(100vh - var(--space-8));
+            }
+
+            .cost-card {
+                flex-wrap: wrap;
+            }
+
+            .cost-item {
+                min-width: calc(50% - var(--space-2));
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--color-bg-tertiary);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-text-tertiary);
+            border-radius: var(--radius-full);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--color-text-secondary);
+        }
+
+        /* Selection */
+        ::selection {
+            background: var(--color-brand-primary);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🔬</div>
+                <span>Deep Research</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-ghost btn-sm" onclick="loadHistory()">
+                    🔄 Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    AI-Powered Research System
+                </div>
+                <h1>Deep Research System</h1>
+                <p>Ask any question and get comprehensive, AI-powered research reports with source attribution, cost tracking, and full traceability.</p>
+            </section>
+
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-card">
+                    <label class="search-label" for="research-query">What would you like to research?</label>
+                    <div class="search-input-wrapper">
+                        <textarea 
+                            id="research-query" 
+                            class="search-input" 
+                            placeholder="Enter your research question here... (e.g., What are the latest developments in artificial intelligence in 2024?)"
+                            rows="3"
+                        ></textarea>
+                    </div>
+                    <div class="search-actions">
+                        <span class="search-hint">Minimum 10 characters required</span>
+                        <button class="btn btn-primary btn-lg" id="start-research-btn" onclick="startResearch()">
+                            🚀 Start Research
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Research History -->
+            <section class="history-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">📜</span>
+                        Research History
+                    </h2>
+                </div>
+                <div class="history-list" id="history-list">
+                    <!-- History items will be loaded here -->
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3 class="empty-state-title">No research yet</h3>
+                        <p class="empty-state-text">Start your first research above!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="section-icon">📁</span>
+                        Upload Document
+                    </h2>
+                </div>
+                <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+                    <div class="upload-icon">📄</div>
+                    <p class="upload-text">Drag & drop or click to upload</p>
+                    <p class="upload-hint">Supports PDF and TXT files (max 10MB)</p>
+                </div>
+                <input type="file" id="file-input" accept=".pdf,.txt" style="display: none;" onchange="handleFileSelect(event)">
+            </section>
+        </div>
+    </main>
+
+    <!-- Research Detail Modal -->
+    <div class="modal-overlay" id="research-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Research Details</h3>
+                <button class="modal-close" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn btn-primary" id="continue-research-btn" onclick="openContinueModal()">
+                    🔄 Continue Research
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Continue Research Modal -->
+    <div class="modal-overlay" id="continue-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Continue Research</h3>
+                <button class="modal-close" onclick="closeContinueModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <label class="search-label" for="continue-query">Build upon previous research:</label>
+                <textarea 
+                    id="continue-query" 
+                    class="search-input" 
+                    placeholder="Enter your follow-up research question..."
+                    rows="3"
+                ></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeContinueModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="continueResearch()">
+                    🚀 Continue Research
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        // ============================================
+        // DEEP RESEARCH SYSTEM - FRONTEND LOGIC
+        // By Prince Ochidi
+        // ============================================
+
+        const API_BASE = 'http://127.0.0.1:8000/api/research';
+        let currentResearchId = null;
+        let pollingInterval = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+            setupDragAndDrop();
+        });
+
+        // ============================================
+        // API FUNCTIONS
+        // ============================================
+
+        async function startResearch() {
+            const query = document.getElementById('research-query').value.trim();
+            
+            if (query.length < 10) {
+                showToast('Please enter at least 10 characters', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('start-research-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Starting...';
+
+            try {
+                const response = await fetch(`${API_BASE}/start/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Research started successfully!', 'success');
+                    document.getElementById('research-query').value = '';
+                    loadHistory();
+                    startPolling(data.research_id);
+                } else {
+                    showToast(data.error || 'Failed to start research', 'error');
+                }
+            } catch (error) {
+                showToast('Connection error. Is the server running?', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Start Research';
+            }
+        }
+
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/history/`);
+                const data = await response.json();
+                renderHistory(data.results);
+            } catch (error) {
+                console.error('Failed to load history:', error);
+            }
+        }
+
+        async function loadResearchDetail(researchId) {
+            try {
+                const response = await fetch(`${API_BASE}/${researchId}/`);
+                const data = await response.json();
+                
+                currentResearchId = researchId;
+                renderResearchDetail(data);
+                openModal();
+            } catch (error) {
+                showToast('Failed to load research details', 'error');
+            }
+        }
+
+        async function continueResearch() {
+            const query = document.getElementById('continue-query').value.trim();
+            
+            if (query.length < 10) {
+                showToast('Please enter at least 10 characters', 'error');
+                return;
+            }
+
+            if (!currentResearchId) {
+                showToast('No research selected', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/continue/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        previous_research_id: currentResearchId,
+                        query: query
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Continuation research started!', 'success');
+                    closeContinueModal();
+                    closeModal();
+                    document.getElementById('continue-query').value = '';
+                    loadHistory();
+                    startPolling(data.research_id);
+                } else {
+                    showToast(data.error || 'Failed to continue research', 'error');
+                }
+            } catch (error) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        async function uploadFile(file, researchId) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('research_id', researchId);
+
+            try {
+                const response = await fetch(`${API_BASE}/upload/`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast(`File "${data.filename}" uploaded successfully!`, 'success');
+                    loadHistory();
+                } else {
+                    showToast(data.error || 'Failed to upload file', 'error');
+                }
+            } catch (error) {
+                showToast('Connection error', 'error');
+            }
+        }
+
+        // ============================================
+        // POLLING FOR RESEARCH STATUS
+        // ============================================
+
+        function startPolling(researchId) {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+            }
+
+            pollingInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/${researchId}/`);
+                    const data = await response.json();
+
+                    if (data.status === 'completed' || data.status === 'failed') {
+                        clearInterval(pollingInterval);
+                        pollingInterval = null;
+                        loadHistory();
+                        
+                        if (data.status === 'completed') {
+                            showToast('Research completed! 🎉', 'success');
+                        } else {
+                            showToast('Research failed', 'error');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 3000);
+        }
+
+        // ============================================
+        // RENDER FUNCTIONS
+        // ============================================
+
+        function renderHistory(items) {
+            const container = document.getElementById('history-list');
+
+            if (!items || items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <h3 class="empty-state-title">No research yet</h3>
+                        <p class="empty-state-text">Start your first research above!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="history-card" onclick="loadResearchDetail('${item.id}')">
+                    <div class="history-card-header">
+                        <div class="history-card-title">${escapeHtml(item.query)}</div>
+                        <span class="history-card-status status-${item.status}">
+                            <span class="status-dot"></span>
+                            ${capitalizeFirst(item.status)}
+                        </span>
+                    </div>
+                    <div class="history-card-meta">
+                        <span>📅 ${formatDate(item.created_at)}</span>
+                        ${item.completed_at ? `<span>⏱️ ${getTimeDiff(item.created_at, item.completed_at)}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderResearchDetail(data) {
+            const container = document.getElementById('modal-body');
+            
+            const summaryHtml = data.summary ? `
+                <div class="research-detail-section">
+                    <h4 class="research-detail-section-title">📝 Summary</h4>
+                    <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                        ${escapeHtml(data.summary.summary_text)}
+                    </p>
+                </div>
+                ${data.summary.key_findings && data.summary.key_findings.length > 0 ? `
+                    <div class="research-detail-section">
+                        <h4 class="research-detail-section-title">🎯 Key Findings</h4>
+                        <div class="research-findings">
+                            ${data.summary.key_findings.map(finding => `
+                                <div class="research-finding">
+                                    <span class="research-finding-icon">✓</span>
+                                    <span>${escapeHtml(finding)}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            ` : '';
+
+            const costHtml = data.cost ? `
+                <div class="research-detail-section">
+                    <h4 class="research-detail-section-title">💰 Cost & Usage</h4>
+                    <div class="cost-card">
+                        <div class="cost-item">
+                            <div class="cost-value">${data.cost.input_tokens.toLocaleString()}</div>
+                            <div class="cost-label">Input Tokens</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-value">${data.cost.output_tokens.toLocaleString()}</div>
+                            <div class="cost-label">Output Tokens</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-value">${data.cost.total_tokens.toLocaleString()}</div>
+                            <div class="cost-label">Total Tokens</div>
+                        </div>
+                        <div class="cost-item">
+                            <div class="cost-value">$${parseFloat(data.cost.estimated_cost).toFixed(4)}</div>
+                            <div class="cost-label">Est. Cost</div>
+                        </div>
+                    </div>
+                </div>
+            ` : '';
+
+            const reportHtml = data.final_report ? `
+                <div class="research-detail-section">
+                    <h4 class="research-detail-section-title">📄 Full Report</h4>
+                    <div class="research-report">${escapeHtml(data.final_report)}</div>
+                </div>
+            ` : '';
+
+            container.innerHTML = `
+                <div class="research-detail-header">
+                    <div class="research-detail-query">${escapeHtml(data.query)}</div>
+                    <div class="research-detail-meta">
+                        <span class="history-card-status status-${data.status}">
+                            <span class="status-dot"></span>
+                            ${capitalizeFirst(data.status)}
+                        </span>
+                        <span>📅 ${formatDate(data.created_at)}</span>
+                        ${data.trace_id ? `<span>🔗 ${data.trace_id.slice(0, 8)}...</span>` : ''}
+                        ${data.parent_session_id ? `<span>↩️ Continuation</span>` : ''}
+                    </div>
+                </div>
+                ${summaryHtml}
+                ${costHtml}
+                ${reportHtml}
+            `;
+
+            // Disable continue button if not completed
+            const continueBtn = document.getElementById('continue-research-btn');
+            continueBtn.disabled = data.status !== 'completed';
+        }
+
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+
+        function openModal() {
+            document.getElementById('research-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('research-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function openContinueModal() {
+            closeModal();
+            document.getElementById('continue-modal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeContinueModal() {
+            document.getElementById('continue-modal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // ============================================
+        // FILE UPLOAD FUNCTIONS
+        // ============================================
+
+        function setupDragAndDrop() {
+            const zone = document.getElementById('upload-zone');
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    promptForResearchAndUpload(files[0]);
+                }
+            });
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                promptForResearchAndUpload(file);
+            }
+        }
+
+        function promptForResearchAndUpload(file) {
+            // For simplicity, we'll ask user to select a research first
+            // In a full implementation, you'd have a proper selection UI
+            const researchId = prompt('Enter the Research ID to attach this file to:');
+            
+            if (researchId && researchId.trim()) {
+                uploadFile(file, researchId.trim());
+            } else {
+                showToast('Please enter a valid Research ID', 'error');
+            }
+        }
+
+        // ============================================
+        // TOAST NOTIFICATIONS
+        // ============================================
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+            
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <span class="toast-message">${escapeHtml(message)}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function capitalizeFirst(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getTimeDiff(start, end) {
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            const diffMs = endDate - startDate;
+            const diffSec = Math.floor(diffMs / 1000);
+            
+            if (diffSec < 60) return `${diffSec}s`;
+            const diffMin = Math.floor(diffSec / 60);
+            if (diffMin < 60) return `${diffMin}m ${diffSec % 60}s`;
+            const diffHour = Math.floor(diffMin / 60);
+            return `${diffHour}h ${diffMin % 60}m`;
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeContinueModal();
+            }
+        });
+
+        // Close modal on overlay click
+        document.getElementById('research-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeModal();
+            }
+        });
+
+        document.getElementById('continue-modal').addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                closeContinueModal();
+            }
+        });
+    </script>
+</body>
+</html>

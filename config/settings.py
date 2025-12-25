@@ -27,11 +27,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Third party
     'rest_framework',
+    'corsheaders',
     # Our apps
     'research',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -123,3 +125,6 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 # Tavily settings (for web search)
 TAVILY_API_KEY = os.getenv('TAVILY_API_KEY')
+
+# CORS Settings
+CORS_ALLOW_ALL_ORIGINS = True
