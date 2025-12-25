@@ -1,0 +1,109 @@
+{
+  "info": {
+    "name": "Deep Research System API",
+    "description": "API collection for testing the Deep Research System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Start Research",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"query\": \"What are the latest developments in artificial intelligence in 2024?\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/research/start/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "research", "start", ""]
+        }
+      }
+    },
+    {
+      "name": "Get Research History",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/research/history/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "research", "history", ""]
+        }
+      }
+    },
+    {
+      "name": "Get Research Details",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{base_url}}/api/research/{{research_id}}/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "research", "{{research_id}}", ""]
+        }
+      }
+    },
+    {
+      "name": "Continue Research",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"previous_research_id\": \"{{research_id}}\",\n    \"query\": \"What specific breakthroughs happened in healthcare AI diagnostics?\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/api/research/continue/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "research", "continue", ""]
+        }
+      }
+    },
+    {
+      "name": "Upload Document",
+      "request": {
+        "method": "POST",
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": ""
+            },
+            {
+              "key": "research_id",
+              "value": "{{research_id}}",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{base_url}}/api/research/upload/",
+          "host": ["{{base_url}}"],
+          "path": ["api", "research", "upload", ""]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000"
+    },
+    {
+      "key": "research_id",
+      "value": "your-research-uuid-here"
+    }
+  ]
+}
