@@ -232,7 +232,31 @@ curl -X POST http://localhost:8000/api/research/upload/ \
   }
 }
 ```
+## 🖥️ Frontend Dashboard
 
+A beautiful, responsive frontend built following the **Sovereign Design System** principles.
+
+### Features
+- 🎨 Dark theme with gradient accents
+- 🔍 Real-time research status updates
+- 📊 Modal view with full report, summary, key findings, and cost
+- 🔄 Continue research functionality
+- 📁 File upload support
+- ✨ Smooth animations and micro-interactions
+
+### Running the Frontend
+1. Start the Django server: `python manage.py runserver`
+2. Open `frontend/index.html` in your browser
+3. Start researching!
+
+### Design Principles Applied
+- **8-point spacing grid** for mathematical harmony
+- **CSS Custom Properties** for design tokens
+- **WCAG AA compliant** color contrast
+- **Responsive design** for all screen sizes
+- **Micro-interactions** for delightful UX
+
+---
 ## 👨‍💻 Author
 
 Built for Creston & Company Python Developer Internship Challenge
