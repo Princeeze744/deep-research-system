@@ -1,262 +1,247 @@
-# 🔬 Deep Research System
+# Deep Research System
 
-A powerful AI-powered research system built with Django, LangChain, and PostgreSQL. This system performs multi-step deep research using AI agents, with support for research continuation, document uploads, cost tracking, and full observability via LangSmith.
+A Django REST API that integrates with **LangChain's Open Deep Research** repository to provide comprehensive AI-powered research capabilities.
 
-## 🎯 Features
-
-- **Deep AI Research**: Execute comprehensive multi-step research queries using GPT-4o-mini
-- **Research History**: All research sessions are persisted with full details
-- **Research Continuation**: Build upon previous research without repeating covered topics
-- **Document Upload**: Upload PDF/TXT files to provide additional context for research
-- **Reasoning Visibility**: See how the AI planned and executed the research
-- **Cost Tracking**: Track token usage and estimated costs for each research session
-- **LangSmith Tracing**: Full observability with trace IDs for debugging
-
-## 🛠️ Tech Stack
-
-| Component | Technology |
-|-----------|------------|
-| Backend Framework | Django 6.0 + Django REST Framework |
-| Database | PostgreSQL 18 |
-| AI Framework | LangChain + LangGraph |
-| LLM | OpenAI GPT-4o-mini |
-| Tracing | LangSmith |
-| Async Tasks | Threading (Celery-ready) |
-
-## 📁 Project Structure
+## 🎯 Architecture
 ```
-deep-research-project/
-├── config/                  # Django configuration
-│   ├── settings.py         # Main settings
-│   ├── urls.py             # URL routing
-│   ├── celery.py           # Celery configuration
-│   └── wsgi.py             # WSGI entry point
-├── research/               # Main research app
-│   ├── models.py           # Database models
-│   ├── views.py            # API views
-│   ├── serializers.py      # DRF serializers
-│   ├── services.py         # Business logic
-│   ├── urls.py             # App URLs
-│   └── admin.py            # Admin configuration
-├── open_deep_research/     # Base research repo (integrated)
-├── media/                  # Uploaded files
-├── .env                    # Environment variables
-├── requirements.txt        # Python dependencies
-└── README.md              # This file
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   User Request                                                  │
+│       │                                                         │
+│       ▼                                                         │
+│   ┌─────────────────┐         ┌─────────────────────────────┐  │
+│   │  DJANGO API     │  calls  │  OPEN DEEP RESEARCH         │  │
+│   │  (Port 8000)    │ ──────► │  (LangGraph Server)         │  │
+│   │                 │         │  (Port 2024)                │  │
+│   │  - REST API     │         │                             │  │
+│   │  - PostgreSQL   │ ◄────── │  - Multi-agent research     │  │
+│   │  - History      │ results │  - Tavily web search        │  │
+│   │  - Cost tracking│         │  - OpenAI GPT-4             │  │
+│   └─────────────────┘         └─────────────────────────────┘  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-## 🗄️ Database Models
+## 🔗 Open Deep Research Integration
 
-| Model | Purpose |
-|-------|---------|
-| `ResearchSession` | Main research record with query, report, status |
-| `ResearchSummary` | Summarized findings and key points |
-| `ResearchReasoning` | Query plan, search strategy, reasoning steps |
-| `UploadedDocument` | Files uploaded for research context |
-| `ResearchCost` | Token usage and cost tracking |
+This project uses the **mandatory base repository**:
+- **Repository:** [langchain-ai/open_deep_research](https://github.com/langchain-ai/open_deep_research)
+- **Integration:** LangGraph SDK client connects Django to the research server
+- **Workflow:** Clarify → Research Brief → Multi-source Research → Compress → Final Report
 
-## 🌐 API Endpoints
+## ✅ Features Implemented
 
-### Start New Research
-```
+| Requirement | Status | Description |
+|-------------|--------|-------------|
+| Django REST Framework | ✅ | Full REST API with all endpoints |
+| PostgreSQL Database | ✅ | Persistent storage for research sessions |
+| LangSmith Tracing | ✅ | Full observability and debugging |
+| Research History | ✅ | Query all past research sessions |
+| Cost & Token Tracking | ✅ | Track usage and estimate costs |
+| Async Research | ✅ | Non-blocking research execution |
+| Open Deep Research | ✅ | **Integrated via LangGraph SDK** |
+| Research Continuation | ✅ | Parent-child research linking |
+| File Upload | ✅ | PDF and TXT document support |
+
+## 🚀 API Endpoints
+
+### 1. Start Research
+```bash
 POST /api/research/start/
-Body: {"query": "Your research question here"}
+Content-Type: application/json
+
+{
+  "query": "What is artificial intelligence?",
+  "user_id": "optional-user-id"
+}
 ```
 
-### Continue Previous Research
-```
-POST /api/research/continue/
-Body: {"previous_research_id": "uuid", "query": "Follow-up question"}
+### 2. Continue Research (with parent context)
+```bash
+POST /api/research/{research_id}/continue/
+Content-Type: application/json
+
+{
+  "query": "What are the ethical concerns?"
+}
 ```
 
-### Upload Document
-```
-POST /api/research/upload/
-Form Data: file=@document.pdf, research_id=uuid
-```
-
-### Get Research History
-```
-GET /api/research/history/
+### 3. Get Research History
+```bash
+GET /api/research/history/?user_id=anonymous
 ```
 
-### Get Research Details
-```
+### 4. Get Research Detail
+```bash
 GET /api/research/{research_id}/
 ```
 
-## 🚀 Setup Instructions
+### 5. Upload Document
+```bash
+POST /api/research/{research_id}/upload/
+Content-Type: multipart/form-data
+
+file: <PDF or TXT file>
+```
+
+## 📦 Installation
 
 ### Prerequisites
 - Python 3.11+
-- PostgreSQL 15+
-- OpenAI API Key
-- LangSmith API Key
+- PostgreSQL
+- Node.js (for LangGraph CLI)
 
-### Installation
-
-1. **Clone the repository**
+### Step 1: Clone and Setup Django App
 ```bash
-git clone https://github.com/yourusername/deep-research-project.git
-cd deep-research-project
-```
+git clone https://github.com/Princeeze744/deep-research-system.git
+cd deep-research-system
 
-2. **Create virtual environment**
-```bash
+# Create virtual environment
 python -m venv venv
-.\venv\Scripts\Activate.ps1  # Windows
-source venv/bin/activate      # Linux/Mac
-```
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Linux/Mac
 
-3. **Install dependencies**
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-4. **Create PostgreSQL database**
+### Step 2: Clone Open Deep Research
 ```bash
-psql -U postgres -c "CREATE DATABASE deep_research_db;"
+cd ..
+git clone https://github.com/langchain-ai/open_deep_research.git
+cd open_deep_research
+
+# Setup with uv
+pip install uv
+uv venv --python 3.11
+.venv\Scripts\activate  # Windows
+uv sync
 ```
 
-5. **Configure environment variables**
-Create `.env` file:
+### Step 3: Configure Environment Variables
+
+**Django App (.env):**
 ```env
 OPENAI_API_KEY=your-openai-key
 LANGCHAIN_API_KEY=your-langsmith-key
 LANGCHAIN_TRACING_V2=true
-LANGCHAIN_PROJECT=deep-research-project
-SECRET_KEY=your-django-secret-key
-DEBUG=True
+LANGCHAIN_PROJECT=deep-research-system
+LANGGRAPH_API_URL=http://127.0.0.1:2024
+DATABASE_URL=postgresql://postgres:password@localhost:5432/deep_research_db
 ```
 
-6. **Run migrations**
+**Open Deep Research (.env):**
+```env
+OPENAI_API_KEY=your-openai-key
+TAVILY_API_KEY=your-tavily-key
+LANGCHAIN_API_KEY=your-langsmith-key
+LANGCHAIN_TRACING_V2=true
+LANGSMITH_TRACING=true
+```
+
+### Step 4: Setup Database
 ```bash
+cd deep-research-system
 python manage.py migrate
 ```
 
-7. **Create superuser**
+### Step 5: Run Both Servers
+
+**Terminal 1 - LangGraph Server:**
 ```bash
-python manage.py createsuperuser
+cd open_deep_research
+.venv\Scripts\activate
+langgraph dev
 ```
 
-8. **Run the server**
+**Terminal 2 - Django Server:**
 ```bash
+cd deep-research-system
+venv\Scripts\activate
 python manage.py runserver
 ```
 
-## 📊 Design Decisions
-
-### 1. Research Continuation Logic
-- Previous research summary is injected into new research context
-- System explicitly instructs AI to avoid repeating covered topics
-- Parent-child relationship maintained via `parent_session` foreign key
-
-### 2. Cost Tracking Implementation
-- Uses `tiktoken` library for accurate token counting
-- Tracks input/output tokens separately
-- Calculates cost based on current OpenAI pricing
-- Stored per session for historical analysis
-
-### 3. LangSmith Tracing
-- Enabled via environment variables
-- Each research generates unique `trace_id`
-- All LLM calls and tool usage captured
-- Enables debugging and performance analysis
-
-### 4. Async Research Execution
-- Research runs in background threads
-- API returns immediately with `pending` status
-- Client polls for completion
-- Ready for Celery integration in production
-
-### 5. Document Processing
-- Supports PDF and TXT files
-- Text extraction via `pdfplumber`
-- Auto-summarization of uploaded content
-- Content injected into research context
-
-## 🧪 Testing the API
-
-### Using cURL
-
-**Start Research:**
+## 🧪 Testing
 ```bash
-curl -X POST http://localhost:8000/api/research/start/ \
+# Test research endpoint
+curl -X POST http://127.0.0.1:8000/api/research/start/ \
   -H "Content-Type: application/json" \
-  -d '{"query": "What are the latest developments in AI?"}'
+  -d '{"query": "What is artificial intelligence?"}'
+
+# Test history endpoint
+curl http://127.0.0.1:8000/api/research/history/
 ```
 
-**Check Status:**
-```bash
-curl http://localhost:8000/api/research/{research_id}/
-```
-
-**Continue Research:**
-```bash
-curl -X POST http://localhost:8000/api/research/continue/ \
-  -H "Content-Type: application/json" \
-  -d '{"previous_research_id": "uuid", "query": "Tell me more about healthcare AI"}'
-```
-
-**Upload Document:**
-```bash
-curl -X POST http://localhost:8000/api/research/upload/ \
-  -F "file=@document.pdf" \
-  -F "research_id=uuid"
-```
-
-## 📈 Sample Response
+## 📊 Sample Response
 ```json
 {
-  "id": "2e2d263c-d0a4-49dd-a017-82de8b831570",
-  "query": "What are the latest developments in AI?",
+  "research_id": "8cfef13c-c134-4cd1-ba25-f45c7347dd5d",
   "status": "completed",
-  "final_report": "# Research Report...",
-  "trace_id": "73a7a9e1-e694-447a-a7d5-cd35b17dc819",
-  "summary": {
-    "summary_text": "...",
-    "key_findings": ["...", "..."],
-    "sources": ["...", "..."]
+  "query": "What is artificial intelligence?",
+  "report": "# Artificial Intelligence: A Comprehensive Overview\n\n## Introduction\n\nArtificial Intelligence (AI) is one of the most transformative technologies...",
+  "summary": "AI is the field of computer science focused on creating systems capable of tasks requiring human intelligence...",
+  "sources": [...],
+  "token_usage": {
+    "input_tokens": 5,
+    "output_tokens": 1842,
+    "total_tokens": 1847
   },
-  "reasoning": {
-    "query_plan": "...",
-    "search_strategy": "...",
-    "reasoning_steps": ["...", "..."]
-  },
-  "cost": {
-    "input_tokens": 3350,
-    "output_tokens": 3222,
-    "total_tokens": 6572,
-    "estimated_cost": "0.002436",
-    "model_used": "gpt-4o-mini"
-  }
+  "estimated_cost": 0.1107,
+  "elapsed_time": 163.54
 }
 ```
-## 🖥️ Frontend Dashboard
 
-A beautiful, responsive frontend built following the **Sovereign Design System** principles.
+## 🛠️ Tech Stack
 
-### Features
-- 🎨 Dark theme with gradient accents
-- 🔍 Real-time research status updates
-- 📊 Modal view with full report, summary, key findings, and cost
-- 🔄 Continue research functionality
-- 📁 File upload support
-- ✨ Smooth animations and micro-interactions
+- **Backend:** Django 5.0, Django REST Framework
+- **Database:** PostgreSQL
+- **AI/ML:** LangChain, LangGraph, OpenAI GPT-4
+- **Search:** Tavily API
+- **Observability:** LangSmith
+- **Base Repo:** [langchain-ai/open_deep_research](https://github.com/langchain-ai/open_deep_research)
 
-### Running the Frontend
-1. Start the Django server: `python manage.py runserver`
-2. Open `frontend/index.html` in your browser
-3. Start researching!
+## 📁 Project Structure
+```
+deep-research-system/
+├── config/
+│   ├── settings.py
+│   └── urls.py
+├── research/
+│   ├── models.py           # ResearchSession, ResearchDocument
+│   ├── views.py            # API endpoints
+│   ├── urls.py             # URL routing
+│   ├── langgraph_client.py # Open Deep Research integration
+│   └── admin.py            # Django admin
+├── requirements.txt
+├── manage.py
+└── README.md
+```
 
-### Design Principles Applied
-- **8-point spacing grid** for mathematical harmony
-- **CSS Custom Properties** for design tokens
-- **WCAG AA compliant** color contrast
-- **Responsive design** for all screen sizes
-- **Micro-interactions** for delightful UX
+## 🔑 Key Integration: langgraph_client.py
+```python
+from langgraph_sdk import get_sync_client
 
----
+class OpenDeepResearchClient:
+    def __init__(self):
+        self.client = get_sync_client(url="http://127.0.0.1:2024")
+        self.assistant_id = "e9a5370f-7a53-55a8-ada8-6ab9ef15bb5b"
+    
+    def run_research(self, query, previous_context=None):
+        thread = self.client.threads.create()
+        result = self.client.runs.wait(
+            thread_id=thread["thread_id"],
+            assistant_id=self.assistant_id,
+            input={"messages": [{"role": "user", "content": query}]}
+        )
+        # Process and return results...
+```
+
+## 📈 LangSmith Tracing
+
+All research sessions are traced in LangSmith for full observability:
+- View at: https://smith.langchain.com
+- Project: `deep-research-system`
+
 ## 👨‍💻 Author
 
 Built for Creston & Company Python Developer Internship Challenge

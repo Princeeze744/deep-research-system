@@ -1,228 +1,331 @@
 """
-API Views for Deep Research system.
-Handles research execution, continuation, file uploads, and history.
+Views for Deep Research API - Using Open Deep Research (LangGraph)
 """
 
 from rest_framework import status
-from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
-from django.contrib.auth.models import User
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
+import uuid
 
-from .models import (
-    ResearchSession,
-    ResearchSummary,
-    ResearchReasoning,
-    UploadedDocument,
-    ResearchCost
-)
-from .serializers import (
-    ResearchSessionListSerializer,
-    ResearchSessionDetailSerializer,
-    StartResearchSerializer,
-    ContinueResearchSerializer,
-    FileUploadSerializer
-)
-from .services import ResearchService, DocumentService
+from .models import ResearchSession, ResearchDocument
+from .langgraph_client import deep_research_client
 
 
-class StartResearchView(APIView):
+@api_view(['POST'])
+def start_research(request):
     """
-    POST /api/research/start/
-    Start a new research session.
+    POST /api/research/start
+    Start a new deep research session using Open Deep Research.
     """
+    query = request.data.get('query')
+    user_id = request.data.get('user_id', 'anonymous')
+    parent_research_id = request.data.get('parent_research_id')
     
-    def post(self, request):
-        serializer = StartResearchSerializer(data=request.data)
-        
-        if not serializer.is_valid():
-            return Response(
-                {'error': 'Invalid input', 'details': serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        query = serializer.validated_data['query']
-        
-        # Get or create a default user (for demo purposes)
-        user, _ = User.objects.get_or_create(
-            username='demo_user',
-            defaults={'email': 'demo@example.com'}
+    if not query:
+        return Response(
+            {'error': 'Query is required'},
+            status=status.HTTP_400_BAD_REQUEST
         )
-        
-        # Create research session
-        session = ResearchSession.objects.create(
-            user=user,
-            query=query,
-            status='pending'
-        )
-        
-        # Create cost tracking record
-        ResearchCost.objects.create(session=session)
-        
-        # Start async research task
-        try:
-            ResearchService.start_research(session)
-            
-            return Response({
-                'message': 'Research started successfully',
-                'research_id': str(session.id),
-                'status': session.status,
-                'query': session.query
-            }, status=status.HTTP_202_ACCEPTED)
-            
-        except Exception as e:
-            session.status = 'failed'
-            session.save()
-            return Response(
-                {'error': f'Failed to start research: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class ContinueResearchView(APIView):
-    """
-    POST /api/research/continue/
-    Continue from a previous research session.
-    """
     
-    def post(self, request):
-        serializer = ContinueResearchSerializer(data=request.data)
-        
-        if not serializer.is_valid():
-            return Response(
-                {'error': 'Invalid input', 'details': serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        previous_research_id = serializer.validated_data['previous_research_id']
-        query = serializer.validated_data['query']
-        
-        # Get previous research session
+    # Handle continuation from parent research
+    previous_context = None
+    parent_session = None
+    
+    if parent_research_id:
         try:
-            parent_session = ResearchSession.objects.get(id=previous_research_id)
+            parent_session = ResearchSession.objects.get(id=parent_research_id)
+            previous_context = f"""
+PREVIOUS QUERY: {parent_session.query}
+
+PREVIOUS FINDINGS:
+{parent_session.summary or parent_session.report[:2000] if parent_session.report else 'No previous findings'}
+"""
         except ResearchSession.DoesNotExist:
             return Response(
-                {'error': 'Previous research session not found'},
+                {'error': 'Parent research session not found'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
-        # Create new session linked to parent
-        session = ResearchSession.objects.create(
-            user=parent_session.user,
+    
+    # Create research session
+    session = ResearchSession.objects.create(
+        user_id=user_id,
+        query=query,
+        status='processing',
+        parent_research=parent_session
+    )
+    
+    try:
+        # Call Open Deep Research via LangGraph
+        result = deep_research_client.run_research(
             query=query,
-            status='pending',
-            parent_session=parent_session
+            previous_context=previous_context
         )
         
-        # Create cost tracking record
-        ResearchCost.objects.create(session=session)
-        
-        # Start async research with parent context
-        try:
-            ResearchService.continue_research(session, parent_session)
-            
-            return Response({
-                'message': 'Continuation research started successfully',
-                'research_id': str(session.id),
-                'parent_research_id': str(parent_session.id),
-                'status': session.status,
-                'query': session.query
-            }, status=status.HTTP_202_ACCEPTED)
-            
-        except Exception as e:
-            session.status = 'failed'
+        if result['success']:
+            # Update session with results
+            session.status = 'completed'
+            session.report = result['report']
+            session.summary = result['summary']
+            session.sources = result['sources']
+            session.reasoning = result['reasoning']
+            session.thread_id = result.get('thread_id')
+            session.input_tokens = result['token_usage']['input_tokens']
+            session.output_tokens = result['token_usage']['output_tokens']
+            session.total_tokens = result['token_usage']['total_tokens']
+            session.estimated_cost = result['estimated_cost']
+            session.completed_at = timezone.now()
             session.save()
-            return Response(
-                {'error': f'Failed to continue research: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class UploadFileView(APIView):
-    """
-    POST /api/research/upload/
-    Upload a document for research context.
-    """
-    parser_classes = (MultiPartParser, FormParser)
-    
-    def post(self, request):
-        serializer = FileUploadSerializer(data=request.data)
-        
-        if not serializer.is_valid():
-            return Response(
-                {'error': 'Invalid input', 'details': serializer.errors},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        file = serializer.validated_data['file']
-        research_id = serializer.validated_data['research_id']
-        
-        # Get research session
-        try:
-            session = ResearchSession.objects.get(id=research_id)
-        except ResearchSession.DoesNotExist:
-            return Response(
-                {'error': 'Research session not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-        
-        # Process and save document
-        try:
-            document = DocumentService.process_upload(file, session)
             
             return Response({
-                'message': 'File uploaded successfully',
-                'document_id': str(document.id),
-                'filename': document.filename,
-                'document_type': document.document_type,
-                'file_size': document.file_size,
-                'summary': document.summary
+                'research_id': str(session.id),
+                'status': 'completed',
+                'query': query,
+                'report': result['report'],
+                'summary': result['summary'],
+                'sources': result['sources'],
+                'reasoning': result['reasoning'],
+                'token_usage': result['token_usage'],
+                'estimated_cost': result['estimated_cost'],
+                'elapsed_time': result['elapsed_time']
             }, status=status.HTTP_201_CREATED)
+        else:
+            session.status = 'failed'
+            session.error_message = result.get('error', 'Unknown error')
+            session.save()
             
-        except Exception as e:
-            return Response(
-                {'error': f'Failed to process file: {str(e)}'},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
-
-class ResearchHistoryView(APIView):
-    """
-    GET /api/research/history/
-    Get list of all research sessions.
-    """
-    
-    def get(self, request):
-        # Get user's research sessions
-        user, _ = User.objects.get_or_create(
-            username='demo_user',
-            defaults={'email': 'demo@example.com'}
-        )
-        
-        sessions = ResearchSession.objects.filter(user=user)
-        serializer = ResearchSessionListSerializer(sessions, many=True)
+            return Response({
+                'research_id': str(session.id),
+                'status': 'failed',
+                'error': result.get('error')
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    except Exception as e:
+        session.status = 'failed'
+        session.error_message = str(e)
+        session.save()
         
         return Response({
-            'count': sessions.count(),
-            'results': serializer.data
-        })
+            'research_id': str(session.id),
+            'status': 'failed',
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class ResearchDetailView(APIView):
+@api_view(['POST'])
+def continue_research(request, research_id):
     """
-    GET /api/research/<research_id>/
-    Get detailed information about a specific research session.
+    POST /api/research/{research_id}/continue
+    Continue a previous research session with a new query.
     """
+    query = request.data.get('query')
     
-    def get(self, request, research_id):
-        try:
-            session = ResearchSession.objects.get(id=research_id)
-        except ResearchSession.DoesNotExist:
-            return Response(
-                {'error': 'Research session not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
+    if not query:
+        return Response(
+            {'error': 'Query is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    parent_session = get_object_or_404(ResearchSession, id=research_id)
+    
+    # Build context from parent
+    previous_context = f"""
+PREVIOUS QUERY: {parent_session.query}
+
+PREVIOUS FINDINGS:
+{parent_session.summary or parent_session.report[:3000] if parent_session.report else 'No previous findings'}
+
+SOURCES USED:
+{parent_session.sources if parent_session.sources else 'None'}
+"""
+    
+    # Create new session linked to parent
+    session = ResearchSession.objects.create(
+        user_id=parent_session.user_id,
+        query=query,
+        status='processing',
+        parent_research=parent_session
+    )
+    
+    try:
+        result = deep_research_client.run_research(
+            query=query,
+            previous_context=previous_context,
+            thread_id=parent_session.thread_id
+        )
         
-        serializer = ResearchSessionDetailSerializer(session)
-        return Response(serializer.data)
+        if result['success']:
+            session.status = 'completed'
+            session.report = result['report']
+            session.summary = result['summary']
+            session.sources = result['sources']
+            session.reasoning = result['reasoning']
+            session.thread_id = result.get('thread_id')
+            session.input_tokens = result['token_usage']['input_tokens']
+            session.output_tokens = result['token_usage']['output_tokens']
+            session.total_tokens = result['token_usage']['total_tokens']
+            session.estimated_cost = result['estimated_cost']
+            session.completed_at = timezone.now()
+            session.save()
+            
+            return Response({
+                'research_id': str(session.id),
+                'parent_research_id': str(parent_session.id),
+                'status': 'completed',
+                'query': query,
+                'report': result['report'],
+                'summary': result['summary'],
+                'sources': result['sources'],
+                'reasoning': result['reasoning'],
+                'token_usage': result['token_usage'],
+                'estimated_cost': result['estimated_cost']
+            }, status=status.HTTP_201_CREATED)
+        else:
+            session.status = 'failed'
+            session.error_message = result.get('error')
+            session.save()
+            
+            return Response({
+                'error': result.get('error')
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    except Exception as e:
+        session.status = 'failed'
+        session.error_message = str(e)
+        session.save()
+        
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def upload_document(request, research_id):
+    """
+    POST /api/research/{research_id}/upload
+    Upload a document for research context.
+    """
+    session = get_object_or_404(ResearchSession, id=research_id)
+    
+    if 'file' not in request.FILES:
+        return Response(
+            {'error': 'No file provided'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    uploaded_file = request.FILES['file']
+    filename = uploaded_file.name.lower()
+    
+    # Validate file type
+    if not (filename.endswith('.pdf') or filename.endswith('.txt')):
+        return Response(
+            {'error': 'Only PDF and TXT files are supported'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    # Extract text content
+    try:
+        if filename.endswith('.txt'):
+            content = uploaded_file.read().decode('utf-8')
+        elif filename.endswith('.pdf'):
+            import pdfplumber
+            content = ""
+            with pdfplumber.open(uploaded_file) as pdf:
+                for page in pdf.pages:
+                    text = page.extract_text()
+                    if text:
+                        content += text + "\n\n"
+        
+        # Create document record
+        doc = ResearchDocument.objects.create(
+            research_session=session,
+            filename=uploaded_file.name,
+            file_type='pdf' if filename.endswith('.pdf') else 'txt',
+            content=content,
+            file_size=uploaded_file.size
+        )
+        
+        return Response({
+            'document_id': str(doc.id),
+            'filename': doc.filename,
+            'file_type': doc.file_type,
+            'content_length': len(content),
+            'message': 'Document uploaded successfully'
+        }, status=status.HTTP_201_CREATED)
+        
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to process document: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+def get_research_history(request):
+    """
+    GET /api/research/history
+    Get all research sessions for a user.
+    """
+    user_id = request.query_params.get('user_id', 'anonymous')
+    
+    sessions = ResearchSession.objects.filter(user_id=user_id).order_by('-created_at')
+    
+    data = [{
+        'id': str(s.id),
+        'query': s.query,
+        'status': s.status,
+        'summary': s.summary,
+        'parent_research_id': str(s.parent_research.id) if s.parent_research else None,
+        'token_usage': {
+            'input_tokens': s.input_tokens,
+            'output_tokens': s.output_tokens,
+            'total_tokens': s.total_tokens
+        },
+        'estimated_cost': float(s.estimated_cost) if s.estimated_cost else 0,
+        'created_at': s.created_at.isoformat(),
+        'completed_at': s.completed_at.isoformat() if s.completed_at else None
+    } for s in sessions]
+    
+    return Response({
+        'count': len(data),
+        'sessions': data
+    })
+
+
+@api_view(['GET'])
+def get_research_detail(request, research_id):
+    """
+    GET /api/research/{research_id}
+    Get detailed information about a research session.
+    """
+    session = get_object_or_404(ResearchSession, id=research_id)
+    
+    # Get uploaded documents
+    documents = [{
+        'id': str(doc.id),
+        'filename': doc.filename,
+        'file_type': doc.file_type,
+        'uploaded_at': doc.uploaded_at.isoformat()
+    } for doc in session.documents.all()]
+    
+    return Response({
+        'id': str(session.id),
+        'user_id': session.user_id,
+        'query': session.query,
+        'status': session.status,
+        'report': session.report,
+        'summary': session.summary,
+        'sources': session.sources,
+        'reasoning': session.reasoning,
+        'documents': documents,
+        'parent_research_id': str(session.parent_research.id) if session.parent_research else None,
+        'thread_id': session.thread_id,
+        'token_usage': {
+            'input_tokens': session.input_tokens,
+            'output_tokens': session.output_tokens,
+            'total_tokens': session.total_tokens
+        },
+        'estimated_cost': float(session.estimated_cost) if session.estimated_cost else 0,
+        'trace_id': session.trace_id,
+        'created_at': session.created_at.isoformat(),
+        'completed_at': session.completed_at.isoformat() if session.completed_at else None
+    })

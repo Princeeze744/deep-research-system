@@ -1,23 +1,14 @@
 """
-URL routing for the Research API.
+URL routes for Deep Research API
 """
 
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    # Start a new research
-    path('start/', views.StartResearchView.as_view(), name='start-research'),
-    
-    # Continue previous research
-    path('continue/', views.ContinueResearchView.as_view(), name='continue-research'),
-    
-    # Upload context file
-    path('upload/', views.UploadFileView.as_view(), name='upload-file'),
-    
-    # Get research history
-    path('history/', views.ResearchHistoryView.as_view(), name='research-history'),
-    
-    # Get research details
-    path('<uuid:research_id>/', views.ResearchDetailView.as_view(), name='research-detail'),
+    path('start/', views.start_research, name='start-research'),
+    path('<uuid:research_id>/continue/', views.continue_research, name='continue-research'),
+    path('<uuid:research_id>/upload/', views.upload_document, name='upload-document'),
+    path('<uuid:research_id>/', views.get_research_detail, name='research-detail'),
+    path('history/', views.get_research_history, name='research-history'),
 ]

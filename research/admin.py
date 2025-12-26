@@ -1,50 +1,25 @@
 """
-Django Admin configuration for Research models.
+Admin configuration for Deep Research System
 """
 
 from django.contrib import admin
-from .models import (
-    ResearchSession,
-    ResearchSummary,
-    ResearchReasoning,
-    UploadedDocument,
-    ResearchCost
-)
+from .models import ResearchSession, ResearchDocument
 
 
 @admin.register(ResearchSession)
 class ResearchSessionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'query_short', 'user', 'status', 'created_at', 'completed_at']
+    list_display = ['id', 'query_short', 'status', 'user_id', 'total_tokens', 'estimated_cost', 'created_at']
     list_filter = ['status', 'created_at']
-    search_fields = ['query', 'user__username']
-    readonly_fields = ['id', 'trace_id', 'created_at', 'updated_at']
+    search_fields = ['query', 'user_id']
+    readonly_fields = ['id', 'created_at', 'updated_at', 'completed_at']
     
     def query_short(self, obj):
-        return obj.query[:50] + '...' if len(obj.query) > 50 else obj.query
+        return obj.query[:50] + "..." if len(obj.query) > 50 else obj.query
     query_short.short_description = 'Query'
 
 
-@admin.register(ResearchSummary)
-class ResearchSummaryAdmin(admin.ModelAdmin):
-    list_display = ['id', 'session', 'created_at']
-    search_fields = ['session__query']
-
-
-@admin.register(ResearchReasoning)
-class ResearchReasoningAdmin(admin.ModelAdmin):
-    list_display = ['id', 'session', 'created_at']
-    search_fields = ['session__query']
-
-
-@admin.register(UploadedDocument)
-class UploadedDocumentAdmin(admin.ModelAdmin):
-    list_display = ['id', 'filename', 'document_type', 'session', 'uploaded_at']
-    list_filter = ['document_type', 'uploaded_at']
-    search_fields = ['filename', 'session__query']
-
-
-@admin.register(ResearchCost)
-class ResearchCostAdmin(admin.ModelAdmin):
-    list_display = ['id', 'session', 'total_tokens', 'estimated_cost', 'model_used']
-    list_filter = ['model_used']
-    search_fields = ['session__query']
+@admin.register(ResearchDocument)
+class ResearchDocumentAdmin(admin.ModelAdmin):
+    list_display = ['id', 'filename', 'file_type', 'research_session', 'uploaded_at']
+    list_filter = ['file_type', 'uploaded_at']
+    search_fields = ['filename']
